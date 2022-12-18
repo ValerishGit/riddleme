@@ -10,7 +10,9 @@ class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
   final TextEditingController _emailController = TextEditingController(),
       _displayNameController = TextEditingController(),
-      _passwordController = TextEditingController();
+      _passwordController = TextEditingController(),
+      _passwordConfirmController = TextEditingController();
+
   final AuthController _authController = Get.find();
 
   @override
@@ -30,6 +32,9 @@ class RegisterScreen extends StatelessWidget {
                     () => Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            height: 70,
+                          ),
                           Row(
                             children: [
                               GestureDetector(
@@ -77,6 +82,15 @@ class RegisterScreen extends StatelessWidget {
                                     ),
                                     AuthTextField(
                                         inverse: true,
+                                        controller: _passwordConfirmController,
+                                        hint: "Confirm Password",
+                                        icon: Icons.password,
+                                        isHashed: true),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    AuthTextField(
+                                        inverse: true,
                                         controller: _displayNameController,
                                         hint: "Display Name",
                                         icon: Icons.person,
@@ -98,6 +112,7 @@ class RegisterScreen extends StatelessWidget {
                                           _authController.createUserWithCred(
                                               _emailController.text,
                                               _passwordController.text,
+                                              _passwordConfirmController.text,
                                               _displayNameController.text);
                                         },
                                         child: const Text(

@@ -26,7 +26,7 @@ class AuthController extends GetxController {
 
   Future<void> logOutUser() async {
     await FirebaseService.logOutUser();
-    Get.offNamed('/login');
+    await Get.offNamed('/login');
   }
 
   void checkAuthStatus() {}
@@ -51,20 +51,24 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> createUserWithCred(
-      String email, String password, String displayName) async {
+  Future<void> createUserWithCred(String email, String password,
+      String passwordConfirm, String displayName) async {
+    if (password != passwordConfirm) {
+      errText("Passwords do not match");
+      return;
+    }
     isLoading(true);
     try {
       UserCredential? cred = await FirebaseService.createUserWithCred(
           email, password, displayName);
       if (cred != null) {
+        await cred.user!.updateDisplayName(displayName);
+        UserClass newUser = UserClass(displayName, cred.user!.uid,
+            cred.user!.email, DateTime.now(), 0, 0, 0);
+        await FirebaseService.addToDB(newUser);
         cred = await FirebaseService.loginWithCred(email, password);
         if (cred != null) {
-          await cred.user!.updateDisplayName(displayName);
-          activeUser(await FirebaseService.getUserbyId(cred.user!.uid));
-
-          await FirebaseService.addToDB(activeUser.value);
-
+          activeUser(await FirebaseService.getUserbyId(newUser.token!));
           Get.offNamed('/');
         }
       }

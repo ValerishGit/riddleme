@@ -23,7 +23,7 @@ class UserClass {
       'questionAnswered': questionAnswered,
       'score': score,
       'bestTime': bestTime,
-      'lastLogin': lastLogin?.millisecondsSinceEpoch,
+      'lastLogin': lastLogin,
     };
   }
 

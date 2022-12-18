@@ -12,6 +12,9 @@ class FirebaseService {
       throw "All fields are mandatory";
     }
     try {
+      if (await doesNameAlreadyExist(displayName)) {
+        throw "Display Name already exists";
+      }
       credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -42,12 +45,18 @@ class FirebaseService {
       await FirebaseFirestore.instance
           .collection('usersCollection')
           .doc(currentUser.uid)
-          .set({
-        "displayName": currentUser.displayName,
-        "email": currentUser.email,
-        "lastLogin": user.lastLogin
-      });
+          .set(user.toMap());
     }
+  }
+
+  static Future<bool> doesNameAlreadyExist(String name) async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('usersCollection')
+        .where('displayName', isEqualTo: name)
+        .limit(1)
+        .get();
+    final List<DocumentSnapshot> documents = result.docs;
+    return documents.length == 1;
   }
 
   static updateLastLogin() async {
